@@ -42,8 +42,8 @@ def write_file(d, t, prefix='dat_poco_snap_simple'):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--skipprog', action='store_true', default=False,
-                        help='Use this flag to skip programming the FPGA (and configuring ADCs')
+    parser.add_argument('-p', '--prog', action='store_true', default=False,
+                        help='Use this flag to programthe FPGA (THIS SCRIPT DOES NOT DO ADC CALIBRATION)')
     parser.add_argument('-b', '--boffile', default='spoco12_100_2017-03-17_1809.bof',
                         help='Which boffile to program')
     parser.add_argument('-f', '--fftshift', type=int, default=0xffff,
@@ -75,7 +75,7 @@ if __name__ == '__main__':
         print 'Failed to Connect!'
         exit()
 
-    if not opts.skipprog:
+    if opts.prog:
         print 'Trying to program with boffile %s' % opts.boffile
         if opts.boffile in r.listbof():
             r.progdev(opts.boffile)
@@ -83,6 +83,8 @@ if __name__ == '__main__':
         else:
             print 'boffile %s does not exist on server!' % opts.boffile
             exit()
+
+    print 'FPGA board clock is', r.est_brd_clk()
 
     # Configure registers
     print 'Setting FFT shift to %x' % opts.fftshift
@@ -101,7 +103,7 @@ if __name__ == '__main__':
     
 
     print 'Setting accumulation length to %d spectra' % opts.acc_len,
-    print '(%.2f seconds)' % (opts.acc_len * 2. * NCHANS / ADC_CLK)
+    print '(%.2f seconds)' % (opts.acc_len * NCHANS / ADC_CLK)
     r.write_int('acc_length', opts.acc_len * NCHANS)
 
     print 'Triggering sync'
