@@ -20,6 +20,8 @@ def get_data(r, visibilities):
             exit()
         elif vis[0] == vis[1]:
             auto = True
+        else:
+            auto = False
 
         if auto:
             d = np.fromstring(r.read('xengine12_muxed_%s_real' % vis, 4*NCHANS), dtype='>i4')
